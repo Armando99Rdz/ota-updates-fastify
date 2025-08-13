@@ -28,7 +28,7 @@ echo "> Enter the version ID: ${LIGHT}${GRAY}1.0.0(1), 1755037367, 100, etc.${RE
 read versionId
 echo "${RESET}"
 
-updateDir="updates/$versionId.$(date +%s)"
+updateDir="updates/$versionId/$(date +%s)"
 
 if [[ -d "$updateDir" ]]; then
     echo "⚠️  ${YELLOW}Al parecer ya existe una version con este ID. (${updateDir}) ${RESET}"

@@ -241,6 +241,9 @@ exports.putUpdateInResponseAsync = async (req, reply, updateBundlePath, runtimeV
     throw new Error('NoUpdateAvailable');
   }
 
+  const updateTimestamp = updateBundlePath.split('/').pop() ?? ''
+  const updateRelativePath = updateBundlePath.split('/').slice(-3).join('/');
+
   const expoConfig = await this.getExpoConfigAsync({
     updateBundlePath,
     runtimeVersion,
@@ -270,12 +273,14 @@ exports.putUpdateInResponseAsync = async (req, reply, updateBundlePath, runtimeV
       platform,
       ext: null,
     }),
-    metadata: {},
+    metadata: {
+      updateTimestamp,
+      updateRelativePath,
+    },
     extra: {
       expoClient: expoConfig,
     },
   };
-  console.log('helpers::manifest::[', JSON.stringify(manifest), ']')
 
   let signature = null;
   const expectSignatureHeader = req.headers['expo-expect-signature'];

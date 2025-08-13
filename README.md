@@ -17,7 +17,26 @@ expo-updates codesigning:configure \
   --certificate-input-directory=./code-signing \
   --key-input-directory=/path/server/code-signing-keys
 ```
-> NOTE: If last command fails, just need to copy the recommended code to [Expo App Config](https://docs.expo.dev/versions/latest/config/app/) file.
+> NOTE: If last command fails, just need to copy the recommended code to your [Expo App Config](https://docs.expo.dev/versions/latest/config/app/) file.
+
+After that, you will have an [Expo App Config](https://docs.expo.dev/versions/latest/config/app/) like:
+```js
+{
+  ...
+  runtimeVersion: '1.0.0(1)',
+  updates: {
+    url: 'http://127.0.0.1:3000/manifest',
+    enabled: true,
+    fallbackToCacheTimeout: 5000,
+    codeSigningCertificate: './code-signing/certificate.pem',
+    codeSigningMetadata: {
+      keyid: 'main',
+      alg: 'rsa-v1_5-sha256'
+    },
+  },
+  ...
+}
+```
 
 3. According to [Expo docs](https://docs.expo.dev/versions/latest/config/app/) about `expo-updates` testing you need to build the app on release mode. Force close the app and re-open it. It should make a request to `/manifest`, then requests to `/assets`. After the app loads, it should show any changes you made locally.
 
