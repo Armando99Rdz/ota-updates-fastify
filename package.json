@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "expo-publish": "./scripts/publish.sh",
-    "expo-publish-rollback": "./scripts/rollback.sh",
-    "expo-publish-test": "./scripts/publish.sh -d test/$(date +%s)"
+    "expo-publish": "./scripts/publish.sh -d p",
+    "expo-publish-rollback": "./scripts/publish.sh -d r"
   },
   "author": "Armando Rdz",
   "license": "ISC",
