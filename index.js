@@ -46,13 +46,13 @@ fastify.get('/manifest', async (req, reply) => {
 
   const protocolVersionMaybeArray = req.headers['expo-protocol-version'];  
   if (protocolVersionMaybeArray && Array.isArray(protocolVersionMaybeArray)) {
-    return reply.code(400).send({ msg: 'Unsupported protocol version. Expected either 0 or 1.' })
+    return reply.code(400).send({ msg: 'Unsupported protocol version.' /* Expected either 0 or 1. */})
   }
   const protocolVersion = parseInt(protocolVersionMaybeArray ?? '0', 10);
 
   const platform = req.headers['expo-platform'] ?? req.query['platform'];
   if (platform !== 'ios' && platform !== 'android') {
-    return reply.code(400).send({ msg: 'Unsupported platform. Expected either ios or android.' })
+    return reply.code(400).send({ msg: 'Unsupported platform.' /* Expected either ios or android. */})
   }
 
   const runtimeVersion = req.headers['expo-runtime-version'] ?? req.query['runtime-version'];
@@ -64,7 +64,7 @@ fastify.get('/manifest', async (req, reply) => {
   try {
     updateBundlePath = await getLatestUpdateBundlePathForRuntimeVersionAsync(runtimeVersion);
   } catch (error) {
-    console.log(`controller/update/getLatestUpdate...:[ ${JSON.stringify(error.message)} ]`)
+    console.log(`controller/manifest/getLatestUpdate...:[ ${JSON.stringify(error.message)} ]`)
     return reply.status(404).send({ msg: 'Unable to get latest update' })
   }
 
@@ -92,7 +92,7 @@ fastify.get('/manifest', async (req, reply) => {
       throw maybeNoUpdateAvailableError;
     }
   } catch (error) {
-    console.log(`controller/update/error:[ ${JSON.stringify(error.message)} ]`)
+    console.log(`controller/manifest/error:[ ${JSON.stringify(error.message)} ]`)
     return reply.status(404).send({ msg: error.message })
   }
 })

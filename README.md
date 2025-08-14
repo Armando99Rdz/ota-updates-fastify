@@ -44,3 +44,11 @@ After that, you will have an [Expo App Config](https://docs.expo.dev/versions/la
 ### troubleshooting
 ##### iOS does not calls update-server
 Expo-Updates have an [issue](https://github.com/expo/expo/issues/33979) when generate `Expo.plist` file (app)
+
+
+### escenarios a probar
+1. desde una version `built-in code` descargar una update (simple actualización OTA) ✅
+2. desde una version OTA descargar una update OTA ✅
+3. desde una version OTA descargar una update OTA de tipo rollback.
+4. desde una version OTA rollback, descargar una update OTA normal.
+5. generar nueva version nativa (nuevo `runtimeVersion`) y descargar una update OTA normal manteniendo historial anterior de updates.

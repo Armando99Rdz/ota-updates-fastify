@@ -27,7 +27,7 @@ function getBase64URLEncoding(base64EncodedString) {
 /**
  * 
  * @param {{[k: string]: string}} obj 
- * @returns {import('structured-headers').Dictionary}
+ * @returns {Promise<import('structured-headers').Dictionary>}
  */
 exports.convertToDictionaryItemsRepresentation = async (obj) => {
   return new Map(
@@ -66,7 +66,7 @@ exports.getPrivateKeyAsync = async () => {
 exports.getLatestUpdateBundlePathForRuntimeVersionAsync = async (runtimeVersion) => {
   const updatesDirectoryForRuntimeVersion = path.join(__dirname, `updates/${runtimeVersion}`);
   if (!fsSync.existsSync(updatesDirectoryForRuntimeVersion)) {
-    throw new Error('Unsupported runtime version');
+    throw new Error('No updates for this runtimeVersion');
   }
 
   const filesInUpdatesDirectory = await fs.readdir(updatesDirectoryForRuntimeVersion);
@@ -297,7 +297,7 @@ exports.putUpdateInResponseAsync = async (req, reply, updateBundlePath, runtimeV
     }
     const manifestString = JSON.stringify(manifest);
     const hashSignature = this.signRSASHA256(manifestString, privateKey);
-    const dictionary = this.convertToDictionaryItemsRepresentation({
+    const dictionary = await this.convertToDictionaryItemsRepresentation({
       sig: hashSignature,
       keyid: 'main',
     });
@@ -369,7 +369,7 @@ exports.putRollBackInResponseAsync = async (req, reply, updateBundlePath, protoc
     }
     const directiveString = JSON.stringify(directive);
     const hashSignature = this.signRSASHA256(directiveString, privateKey);
-    const dictionary = this.convertToDictionaryItemsRepresentation({
+    const dictionary = await this.convertToDictionaryItemsRepresentation({
       sig: hashSignature,
       keyid: 'main',
     });
@@ -419,7 +419,7 @@ exports.putNoUpdateAvailableInResponseAsync = async (req, reply, protocolVersion
 
     const directiveString = JSON.stringify(directive);
     const hashSignature = this.signRSASHA256(directiveString, privateKey);
-    const dictionary = this.convertToDictionaryItemsRepresentation({
+    const dictionary = await this.convertToDictionaryItemsRepresentation({
       sig: hashSignature,
       keyid: 'main',
     });
