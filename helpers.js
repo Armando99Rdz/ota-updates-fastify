@@ -66,7 +66,7 @@ exports.getPrivateKeyAsync = async () => {
 exports.getLatestUpdateBundlePathForRuntimeVersionAsync = async (runtimeVersion) => {
   const updatesDirectoryForRuntimeVersion = path.join(__dirname, `updates/${runtimeVersion}`);
   if (!fsSync.existsSync(updatesDirectoryForRuntimeVersion)) {
-    throw new Error('No updates for this runtimeVersion');
+    throw new Error('NoUpdateAvailable');
   }
 
   const filesInUpdatesDirectory = await fs.readdir(updatesDirectoryForRuntimeVersion);
@@ -414,7 +414,7 @@ exports.putNoUpdateAvailableInResponseAsync = async (req, reply, protocolVersion
   if (expectSignatureHeader) {
     const privateKey = await this.getPrivateKeyAsync();
     if (!privateKey) {
-      return reply.status('400').send({ msg: 'Code signing requested but no key supplied when starting server.' })
+      return reply.status(400).send({ msg: 'Code signing requested but no key supplied when starting server.' })
     }
 
     const directiveString = JSON.stringify(directive);

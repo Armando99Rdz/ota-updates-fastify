@@ -11,8 +11,8 @@ YELLOW='\033[33m'
 
 
 # -----------------------------------
-ARG_ROLLBACK="r"
 ARG_NEW_VERSION="p"
+ARG_ROLLBACK="r"
 
 while getopts d: flag
 do
@@ -50,17 +50,7 @@ fi
 if [[ "${ARG:-}" == "$ARG_NEW_VERSION" ]]; then
     updateDir="updates/$runtimeVersion/$updateTimestamp"
 elif [[ "${ARG:-}" == "$ARG_ROLLBACK" ]]; then
-    updateDir="updates/$runtimeVersion/${updateTimestamp}r"
-
-    echo "> Enter update timestamp to bring front: ${LIGHT}${GRAY}Debe ser anterior a la última${RESET}${GREEN}"
-    read rollbackUpdateTimestamp
-    echo "${RESET}"
-
-    rollbackUpdatePath="updates/$runtimeVersion/${rollbackUpdateTimestamp}"
-    if [[ ! -d "$rollbackUpdatePath" ]]; then
-        echo "⚠️  ${YELLOW}No existe la versión seleccionada a retroceder ($rollbackUpdatePath).${RESET}"
-        exit 1
-    fi
+    updateDir="updates/$runtimeVersion/${updateTimestamp}r/rollback"
 fi
 
 
@@ -83,15 +73,14 @@ if [[ "${ARG:-}" == "$ARG_NEW_VERSION" ]]; then # -------- PUBLISHING NEW VERSIO
 
 elif [[ "${ARG:-}" == "$ARG_ROLLBACK" ]]; then # -------- PUBLISHING ROLLBACK VERSION --------
 
+    # script original
+    # "mktouch() { mkdir -p $(dirname $1) && touch $1; }; cd . && mktouch updates/1.0.0\\(1\\)/$(date +%s)/rollback"
+
     cd $SERVER_PATH
     echo "Creando dir $updateDir ..."
-    mkdir -p "$updateDir"
 
-    cp -r $rollbackUpdatePath/* $updateDir
-
-    updateJsonFile="$updateDir/update.json"
-    touch "$updateJsonFile"
-    echo "{ \"rollbackRuntimeVersion\": \"$runtimeVersion\", \"rollbackUpdateTimestamp\": \"$rollbackUpdateTimestamp\" }" > "$updateJsonFile"
+    mktouch() { mkdir -p $(dirname $1) && touch $1; };
+    mktouch "$updateDir"
 
     echo "${GREEN}${BOLD}DONE ${RESET}${BOLD}Rollback version published"
     echo ""

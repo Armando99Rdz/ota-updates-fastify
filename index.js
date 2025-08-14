@@ -63,7 +63,12 @@ fastify.get('/manifest', async (req, reply) => {
   let updateBundlePath;
   try {
     updateBundlePath = await getLatestUpdateBundlePathForRuntimeVersionAsync(runtimeVersion);
+    console.log('controller/manifest/latestUpdatePath::[', updateBundlePath, ']')
   } catch (error) {
+    if (error.message === 'NoUpdateAvailable') {
+      await putNoUpdateAvailableInResponseAsync(req, reply, protocolVersion);
+      return;
+    }
     console.log(`controller/manifest/getLatestUpdate...:[ ${JSON.stringify(error.message)} ]`)
     return reply.status(404).send({ msg: 'Unable to get latest update' })
   }
@@ -83,13 +88,15 @@ fastify.get('/manifest', async (req, reply) => {
         );
       } else if (updateType === UpdateType.ROLLBACK) {
         await putRollBackInResponseAsync(req, reply, updateBundlePath, protocolVersion);
+      } else {
+        await putNoUpdateAvailableInResponseAsync(req, reply, protocolVersion);
       }
-    } catch (maybeNoUpdateAvailableError) {
-      if (maybeNoUpdateAvailableError.message === 'NoUpdateAvailable') {
+    } catch (exception) {
+      if (exception.message === 'NoUpdateAvailable') {
         await putNoUpdateAvailableInResponseAsync(req, reply, protocolVersion);
         return;
       }
-      throw maybeNoUpdateAvailableError;
+      throw exception;
     }
   } catch (error) {
     console.log(`controller/manifest/error:[ ${JSON.stringify(error.message)} ]`)
