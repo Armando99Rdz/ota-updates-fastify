@@ -77,10 +77,16 @@ exports.getLatestUpdateBundlePathForRuntimeVersionAsync = async (runtimeVersion)
         return fileStat.isDirectory() ? file : null;
       })
     )
-  )
-    .filter(it => !!it)
+  ).filter(it => !!it)
+  
+  const cleanUpdateDirname = dir => dir.replace(/\D/g, '') ?? ''
+
+  const sortedUpdatesDirectories = directoriesInUpdatesDirectory
+    .map(cleanUpdateDirname)
     .sort((a, b) => parseInt(b, 10) - parseInt(a, 10));
-  return path.join(updatesDirectoryForRuntimeVersion, directoriesInUpdatesDirectory[0]);
+  const mostRecentUpdateDirectory = directoriesInUpdatesDirectory.find(it => cleanUpdateDirname(it) === sortedUpdatesDirectories[0])
+
+  return path.join(updatesDirectoryForRuntimeVersion, mostRecentUpdateDirectory);
 }
 
 /**
