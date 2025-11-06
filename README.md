@@ -1,9 +1,9 @@
 # OTA Updates Server
-This project is based on [custom-expo-updates](https://github.com/expo/custom-expo-updates-server/tree/main) server.
+This project is based on [custom-expo-updates](https://github.com/expo/custom-expo-updates-server/tree/main) server app.
 
-
+## setup enviroment
 ### code-signing keys & certificates
-1. On Expo app root dir you have to use `expo-updates` package to generates code-signing `.pem` files (_public key, private key & certificate_).
+**1.** On Expo app root dir you have to use `expo-updates` package to generates code-signing `.pem` files (_public key, private key & certificate_). Remember replace by your paths on the example commands.
 ```bash
 npx expo-updates codesigning:generate \
   --key-output-directory /path/server/code-signing-keys \
@@ -11,7 +11,9 @@ npx expo-updates codesigning:generate \
   --certificate-validity-duration-years 10 \
   --certificate-common-name "Your Organization Name"
 ```
-2. Copy the recommended command from last output. It can be like:
+A folder will be generated (`./cert`) with code-signing certificates.
+
+**2.** Now we need to configure generated code-signing keys on the expo project. Copy the recommended command from last output. It can be like:
 ```bash
 expo-updates codesigning:configure \
   --certificate-input-directory=./code-signing \
@@ -24,6 +26,7 @@ After that, you will have an [Expo App Config](https://docs.expo.dev/versions/la
 {
   ...
   runtimeVersion: '1.0.0(1)',
+  // New code
   updates: {
     url: 'http://127.0.0.1:3000/manifest',
     enabled: true,
@@ -38,13 +41,39 @@ After that, you will have an [Expo App Config](https://docs.expo.dev/versions/la
 }
 ```
 
-3. According to [Expo docs](https://docs.expo.dev/versions/latest/config/app/) about `expo-updates` testing you need to build the app on release mode. Force close the app and re-open it. It should make a request to `/manifest`, then requests to `/assets`. After the app loads, it should show any changes you made locally.
+You can modify your config properties like `url`, `enabled` & `fallbackToCacheTimeout` as you want
+
+**3.** According to [Expo Updates docs](https://docs.expo.dev/versions/latest/config/app/) to test it you need to build the app on release mode. Force close the app and re-open it. It should make a request to `/manifest`, then requests to `/assets`. After the app loads, it should show any changes you made locally.
 
 
-### troubleshooting
-##### iOS does not calls update-server
-Expo-Updates have an [issue](https://github.com/expo/expo/issues/33979) when generate `Expo.plist` file (app)
+## troubleshooting
+##### iOS: does not calls update-server, code-signing errors
+Expo-Updates have an [known issue](https://github.com/expo/expo/issues/33979) when generate `Expo.plist` file on your Expo app. To solve this just to check your [Expo Config updates values](https://docs.expo.dev/versions/latest/config/app/#updates) has been generated correctly on your iOS `Expo.plist` file. Check the next code.
 
+```xml
+  <!-- ios/[projectName]/Supporting/Expo.plist -->
+  <key>EXUpdatesCodeSigningCertificate</key>
+  <string>-----BEGIN CERTIFICATE....</string>
+  <key>EXUpdatesCodeSigningMetadata</key>
+  <dict>
+    <key>keyid</key>
+    <string><!-- updates.codeSigningMetadata.keyid --></string>
+    <key>alg</key>
+    <string><!-- updates.codeSigningMetadata.alg --></string>
+  </dict>
+  <key>EXUpdatesEnabled</key>
+  <true/>
+  <key>EXUpdatesLaunchWaitMs</key>
+  <integer><!-- updates.codeSigningMetadata.fallbackToCacheTimeout --></integer>
+  <key>EXUpdatesRuntimeVersion</key>
+  <string><!-- runtimeVersion --></string>
+  <key>EXUpdatesURL</key>
+  <string><!-- updates.url --></string>
+```
+
+
+## todo
+- **Rollback a una version OTA**. Actualmente un _rollback_ reestablece todas las actualizaciones OTA para un `runtimeVersion` dejando el código sin actualizaciones desde el servidor de actualizaciones OTA. Se desea tener la capacidad de hacer _rollback_ "cayendo" a una actualizacion OTA deseada anterior a la actual.
 
 ### escenarios a probar
 1. desde una version `built-in code` descargar una update (simple actualización OTA) ✅
